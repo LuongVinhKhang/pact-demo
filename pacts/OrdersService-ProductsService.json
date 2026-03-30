@@ -11,6 +11,9 @@
         }
       ],
       "request": {
+        "headers": {
+          "Authorization": "Bearer internal-service-key-2024"
+        },
         "method": "GET",
         "path": "/products"
       },
@@ -50,6 +53,9 @@
         }
       ],
       "request": {
+        "headers": {
+          "Authorization": "Bearer internal-service-key-2024"
+        },
         "method": "GET",
         "path": "/products/1"
       },

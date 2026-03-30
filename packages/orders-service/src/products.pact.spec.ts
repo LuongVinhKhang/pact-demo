@@ -8,8 +8,10 @@ const provider = new PactV3({
   consumer: 'OrdersService',
   provider: 'ProductsService',
   dir: path.resolve(__dirname, '../../../pacts'),
-  port: 0, // auto-assign a free port for each test run
+  port: 0,
 });
+
+const SERVICE_KEY = 'internal-service-key-2024';
 
 describe('ProductsService contract', () => {
 
@@ -21,6 +23,9 @@ describe('ProductsService contract', () => {
         withRequest: {
           method: 'GET',
           path: '/products/1',
+          headers: {
+            Authorization: `Bearer ${SERVICE_KEY}`,
+          },
         },
         willRespondWith: {
           status: 200,
@@ -34,7 +39,7 @@ describe('ProductsService contract', () => {
         },
       })
       .executeTest(async (mockServer) => {
-        const client = new ProductsClient(mockServer.url);
+        const client = new ProductsClient(mockServer.url, SERVICE_KEY);
         const product = await client.getProduct('1');
 
         expect(product.id).toBeDefined();
@@ -52,6 +57,9 @@ describe('ProductsService contract', () => {
         withRequest: {
           method: 'GET',
           path: '/products',
+          headers: {
+            Authorization: `Bearer ${SERVICE_KEY}`,
+          },
         },
         willRespondWith: {
           status: 200,
@@ -65,7 +73,7 @@ describe('ProductsService contract', () => {
         },
       })
       .executeTest(async (mockServer) => {
-        const client = new ProductsClient(mockServer.url);
+        const client = new ProductsClient(mockServer.url, SERVICE_KEY);
         const products = await client.getAllProducts();
 
         expect(Array.isArray(products)).toBe(true);
