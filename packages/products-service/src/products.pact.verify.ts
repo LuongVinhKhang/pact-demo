@@ -36,6 +36,6 @@ describe('Products Service — Pact Verification', () => {
       },
     });
 
-    await verifier.verifyProvider();
+    await expect(verifier.verifyProvider()).resolves.toBeUndefined();
   }, 30000);
 });
