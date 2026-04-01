@@ -5,6 +5,13 @@
     "orders:start": "pnpm --filter orders-service start",
     "products:start": "pnpm --filter products-service start",
     "consumer:test": "pnpm --filter orders-service test",
-    "provider:verify": "pnpm --filter products-service test:pact"
+    "provider:verify": "pnpm --filter products-service test:pact",
+    "format": "prettier --write \"packages/**/*.{ts,js,json}\""
+  },
+  "devDependencies": {
+    "eslint": "^10.1.0",
+    "eslint-plugin-jest": "^29.15.1",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.58.0"
   }
 }
