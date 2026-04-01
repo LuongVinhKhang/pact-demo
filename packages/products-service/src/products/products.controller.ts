@@ -1,7 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { ProductsService } from './products.service';
+import { Controller, Get, Param } from "@nestjs/common";
+import { ProductsService } from "./products.service";
 
-@Controller('products')
+@Controller("products")
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -10,8 +10,8 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.productsService.findById(id);
   }
 }

@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Param, Body, NotFoundException } from '@nestjs/common';
-import { OrdersService } from './orders.service';
+import { Controller, Get, Post, Param, Body, NotFoundException } from "@nestjs/common";
+import { OrdersService } from "./orders.service";
 
-@Controller('orders')
+@Controller("orders")
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -15,8 +15,8 @@ export class OrdersController {
     return this.ordersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     const order = this.ordersService.findById(id);
     if (!order) throw new NotFoundException(`Order ${id} not found`);
     return order;

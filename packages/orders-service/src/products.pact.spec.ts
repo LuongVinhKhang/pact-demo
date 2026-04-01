@@ -80,5 +80,4 @@ describe("ProductsService contract", () => {
         expect(products[0].id).toBeDefined();
       });
   });
-
 });

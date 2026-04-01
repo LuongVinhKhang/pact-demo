@@ -1,6 +1,6 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { ProductsClient } from '../products.client';
-import { Order } from './order.model';
+import { Injectable, BadRequestException } from "@nestjs/common";
+import { ProductsClient } from "../products.client";
+import { Order } from "./order.model";
 
 @Injectable()
 export class OrdersService {
@@ -9,14 +9,14 @@ export class OrdersService {
   private productsClient: ProductsClient;
 
   constructor() {
-    const productsBaseUrl = process.env.PRODUCTS_URL || 'http://localhost:3001';
-    const serviceKey = process.env.INTERNAL_SERVICE_KEY || 'internal-service-key-2024';
+    const productsBaseUrl = process.env.PRODUCTS_URL || "http://localhost:3001";
+    const serviceKey = process.env.INTERNAL_SERVICE_KEY || "internal-service-key-2024";
     this.productsClient = new ProductsClient(productsBaseUrl, serviceKey);
   }
 
   async createOrder(productId: string, quantity: number): Promise<Order> {
     if (!productId || quantity < 1) {
-      throw new BadRequestException('productId and quantity (>= 1) are required');
+      throw new BadRequestException("productId and quantity (>= 1) are required");
     }
 
     const product = await this.productsClient.getProduct(productId);
@@ -32,7 +32,7 @@ export class OrdersService {
       quantity,
       unitPrice: product.price,
       totalPrice: product.price * quantity,
-      status: 'created',
+      status: "created",
       createdAt: new Date().toISOString(),
     };
 
@@ -45,6 +45,6 @@ export class OrdersService {
   }
 
   findById(id: string): Order | undefined {
-    return this.orders.find(o => o.id === id);
+    return this.orders.find((o) => o.id === id);
   }
 }
