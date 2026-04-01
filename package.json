@@ -1,12 +1,14 @@
 {
   "name": "pact-demo",
   "private": true,
+  "type": "module",
   "scripts": {
     "orders:start": "pnpm --filter orders-service start",
     "products:start": "pnpm --filter products-service start",
     "consumer:test": "pnpm --filter orders-service test",
     "provider:verify": "pnpm --filter products-service test:pact",
-    "format": "prettier --write \"packages/**/*.{ts,js,json}\""
+    "format": "prettier --write \"packages/**/*.{ts,js,json}\"",
+    "lint": "eslint"
   },
   "devDependencies": {
     "eslint": "^10.1.0",
