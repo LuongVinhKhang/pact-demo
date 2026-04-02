@@ -1,15 +1,17 @@
 import "reflect-metadata";
 import { Verifier } from "@pact-foundation/pact";
-import path from "path";
 import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
+import { AppModule } from "../../app.module";
 import { INestApplication } from "@nestjs/common";
+import { PACT_URLS } from "../pact-paths";
 
 let app: INestApplication;
+let port: number;
 
 beforeAll(async () => {
   app = await NestFactory.create(AppModule, { logger: false });
-  await app.listen(3001);
+  await app.listen(0); // OS picks a free port
+  port = app.getHttpServer().address().port;
 });
 
 afterAll(async () => {
@@ -20,20 +22,11 @@ describe("Products Service — Pact Verification", () => {
   it("satisfies all consumer contracts", async () => {
     const verifier = new Verifier({
       provider: "ProductsService",
-      providerBaseUrl: "http://localhost:3001",
+      providerBaseUrl: `http://localhost:${port}`,
 
-      pactUrls: [path.resolve(__dirname, "../../../pacts/OrdersService-ProductsService.json")],
-
-      stateHandlers: {
-        "product with ID 1 exists": async () => {
-          // In-memory service already has product 1
-        },
-        "products exist": async () => {
-          // Already seeded
-        },
-      },
+      pactUrls: [PACT_URLS.ordersService],
     });
 
-    await expect(verifier.verifyProvider()).resolves.toBeUndefined();
+    await expect(verifier.verifyProvider()).resolves.toBeTruthy();
   }, 30000);
 });
