@@ -1,8 +1,8 @@
 import { PactV3, MatchersV3 } from "@pact-foundation/pact";
 import path from "path";
 import { ProductsClient } from "./products.client";
+const { like, eachLike, string, decimal } = MatchersV3;
 
-const { like, eachLike } = MatchersV3;
 
 const provider = new PactV3({
   consumer: "OrdersService",
@@ -125,6 +125,70 @@ describe("ProductsService contract", () => {
         //     statusCode: 404,
         //   });
         // }
+      });
+  });
+
+  it("returns empty list when no products exist", async () => {
+    await provider
+      .addInteraction({
+        states: [{ description: "no products exist" }],
+        uponReceiving: "a request for product list",
+        withRequest: {
+          method: "GET",
+          path: "/products",
+          headers: {
+            Authorization: `Bearer ${SERVICE_KEY}`,
+          },
+        },
+        willRespondWith: {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+          body: [],
+        },
+      })
+      .executeTest(async (mockServer) => {
+        const client = new ProductsClient(mockServer.url, SERVICE_KEY);
+        const products = await client.getAllProducts();
+
+        expect(Array.isArray(products)).toBe(true);
+        expect(products.length).toBe(0);
+      });
+  });
+
+  it("returns a product that is out of stock", async () => {
+    await provider
+      .addInteraction({
+        states: [{
+          description: "product with ID 2 is out of stock"
+        }],
+        uponReceiving: "a request for product 2",
+        withRequest: {
+          method: "GET",
+          path: "/products/2",
+          headers: {
+            Authorization: `Bearer ${SERVICE_KEY}`,
+          }
+        },
+        willRespondWith: {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+          body: {
+            id: "2",
+            name: string(),
+            price: decimal(),
+            inStock: false,
+          },
+        }
+      })
+      .executeTest(async (mockServer) => {
+        const client = new ProductsClient(mockServer.url, SERVICE_KEY);
+        const product = await client.getProduct("2");
+
+        expect(product.id).toBeDefined();
+        expect(product.name).toBeDefined();
+        expect(typeof product.price).toBe("number");
+        expect(typeof product.inStock).toBe("boolean");
+        expect(product.inStock).toBe(false);
       });
   });
 });

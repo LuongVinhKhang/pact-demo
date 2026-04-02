@@ -85,6 +85,61 @@
       }
     },
     {
+      "description": "a request for product 2",
+      "providerStates": [
+        {
+          "name": "product with ID 2 is out of stock"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Authorization": "Bearer internal-service-key-2024"
+        },
+        "method": "GET",
+        "path": "/products/2"
+      },
+      "response": {
+        "body": {
+          "id": "2",
+          "inStock": false,
+          "name": "some string",
+          "price": 12.34
+        },
+        "generators": {
+          "body": {
+            "$.price": {
+              "digits": 10,
+              "type": "RandomDecimal"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.price": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
       "description": "a request for product 999",
       "providerStates": [
         {
@@ -108,6 +163,28 @@
           "Content-Type": "application/json"
         },
         "status": 404
+      }
+    },
+    {
+      "description": "a request for product list",
+      "providerStates": [
+        {
+          "name": "no products exist"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Authorization": "Bearer internal-service-key-2024"
+        },
+        "method": "GET",
+        "path": "/products"
+      },
+      "response": {
+        "body": [],
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "status": 200
       }
     }
   ],
