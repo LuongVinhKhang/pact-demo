@@ -83,6 +83,32 @@
         },
         "status": 200
       }
+    },
+    {
+      "description": "a request for product 999",
+      "providerStates": [
+        {
+          "name": "product with ID 999 is not exist"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Authorization": "Bearer internal-service-key-2024"
+        },
+        "method": "GET",
+        "path": "/products/999"
+      },
+      "response": {
+        "body": {
+          "error": "Not Found",
+          "message": "Product 999 not found",
+          "statusCode": 404
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "status": 404
+      }
     }
   ],
   "metadata": {

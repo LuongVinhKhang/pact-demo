@@ -80,4 +80,51 @@ describe("ProductsService contract", () => {
         expect(products[0].id).toBeDefined();
       });
   });
+
+  it("product with ID 999 does not exist", async () => {
+    await provider
+      .addInteraction({
+        states: [{ description: "product with ID 999 is not exist" }],
+        uponReceiving: "a request for product 999",
+        withRequest: {
+          method: "GET",
+          path: "/products/999",
+          headers: {
+            Authorization: `Bearer ${SERVICE_KEY}`,
+          },
+        },
+        // willRespondWith body → written to the pact file → verified against the REAL provider later  
+        willRespondWith: {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+          body: {
+            "message": "Product 999 not found",
+            "error": "Not Found",
+            "statusCode": 404
+          }
+        },
+      })
+      .executeTest(async (mockServer) => {
+        // This will failed since Pact matches on the full request fingerprint
+        // const client = new ProductsClient(mockServer.url, SERVICE_KEY);
+        // const products = await client.getAllProducts();
+
+        const client = new ProductsClient(mockServer.url, SERVICE_KEY);
+        await expect(client.getProduct("999")).rejects.toMatchObject({
+          response: { status: 404 },
+        });
+
+        // const client = new ProductsClient(mockServer.url,
+        //   SERVICE_KEY);
+        // try {
+        //   await client.getProduct("999");
+        // } catch (err: any) {
+        //   expect(err.response.status).toBe(404);
+        //   expect(err.response.data).toMatchObject({
+        //     error: "Not Found",
+        //     statusCode: 404,
+        //   });
+        // }
+      });
+  });
 });

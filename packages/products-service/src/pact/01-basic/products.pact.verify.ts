@@ -23,8 +23,8 @@ describe("Products Service — Pact Verification", () => {
     const verifier = new Verifier({
       provider: "ProductsService",
       providerBaseUrl: `http://localhost:${port}`,
-
       pactUrls: [PACT_URLS.ordersService],
+      logLevel: "error",
     });
 
     await expect(verifier.verifyProvider()).resolves.toBeTruthy();

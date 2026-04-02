@@ -43,9 +43,8 @@ describe("Products Service — Pact Verification (providerStatesSetupUrl)", () =
     const verifier = new Verifier({
       provider: "ProductsService",
       providerBaseUrl: `http://localhost:${port}`,
-
       pactUrls: [PACT_URLS.ordersService],
-
+      logLevel: "error",
       providerStatesSetupUrl: `http://localhost:${port}/_pact/provider-states`,
     });
 
