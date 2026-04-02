@@ -39,6 +39,14 @@ describe("Products Service — Pact Verification (stateHandlers)", () => {
             { id: "1", name: "Laptop", price: 999.99, inStock: true },
           ];
         },
+        "no products exist": async () => {
+          (productsService as any)["products"] = [];
+        },
+        "product with ID 2 is out of stock": async () => {
+          (productsService as any)["products"] = [
+            { id: "2", name: "Laptop", price: 999.99, inStock: false },
+          ];
+        },
       },
 
       beforeEach: async () => {

@@ -16,18 +16,28 @@ beforeAll(async () => {
   // No extra module or controller needed — production code stays untouched.
   const productsService = app.get(ProductsService);
   app.getHttpAdapter().post("/_pact/provider-states", (req: any, res: any) => {
-    switch (req.body?.state) {
-      case "products exist":
-      case "product with ID 1 exists":
-        (productsService as any)["products"] = [
-          { id: "1", name: "Laptop", price: 999.99, inStock: true },
-        ];
-        break;
-      case "no products exist":
-        (productsService as any)["products"] = [];
-        break;
-    }
-    res.sendStatus(200);
+    let raw = '';
+    req.on('data', (chunk: any) => (raw += chunk));
+    req.on('end', () => {
+      const { state } = JSON.parse(raw || '{}');
+      switch (state) {
+        case "products exist":
+        case "product with ID 1 exists":
+          (productsService as any)["products"] = [
+            { id: "1", name: "Laptop", price: 999.99, inStock: true },
+          ];
+          break;
+        case "no products exist":
+          (productsService as any)["products"] = [];
+          break;
+        case "product with ID 2 is out of stock":
+          (productsService as any)["products"] = [
+            { id: "2", name: "Laptop", price: 999.99, inStock: false },
+          ];
+          break;
+      }
+      res.sendStatus(200);
+    });
   });
 
   await app.listen(0);
