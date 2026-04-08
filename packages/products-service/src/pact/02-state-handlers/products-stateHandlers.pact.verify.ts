@@ -29,8 +29,7 @@ describe("Products Service — Pact Verification (stateHandlers)", () => {
       providerBaseUrl: `http://localhost:${port}`,
       ...(canDeployOptions
         ? {
-            pactBrokerUrl: canDeployOptions.pactBrokerUrl,
-            pactBrokerToken: canDeployOptions.pactBrokerToken,
+            ...canDeployOptions,
             consumerVersionSelectors: [{ branch: brokerConfig.consumerVersionBranch }, { matchingBranch: true }],
             publishVerificationResults: true,
             providerVersion: brokerConfig.consumerVersion,

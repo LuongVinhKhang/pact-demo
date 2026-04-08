@@ -1,6 +1,8 @@
 /**
  * Jest globalTeardown — publishes generated pact files to the Pact Broker.
- * Only runs when PACT_BROKER_URL and PACT_BROKER_TOKEN are set.
+ * Only runs when PACT_BROKER_URL is set along with either:
+ *   - PACT_BROKER_TOKEN (Bearer auth — PactFlow / hosted brokers)
+ *   - PACT_BROKER_USERNAME + PACT_BROKER_PASSWORD (Basic auth — self-hosted broker)
  * Uses the Pact Broker's REST API directly (no extra dependencies required).
  */
 const fs = require("fs");
@@ -11,10 +13,18 @@ const http = require("http");
 module.exports = async function () {
   const brokerUrl = process.env.PACT_BROKER_URL;
   const brokerToken = process.env.PACT_BROKER_TOKEN;
+  const brokerUsername = process.env.PACT_BROKER_USERNAME;
+  const brokerPassword = process.env.PACT_BROKER_PASSWORD;
   const consumerVersion = process.env.GIT_COMMIT ?? "local";
   const consumerVersionBranch = process.env.GIT_BRANCH ?? "local";
 
-  if (!brokerUrl || !brokerToken) return;
+  if (!brokerUrl) return;
+  if (!brokerToken && !(brokerUsername && brokerPassword)) return;
+
+  // Build the Authorization header — Bearer for PactFlow, Basic for self-hosted
+  const authHeader = brokerToken
+    ? `Bearer ${brokerToken}`
+    : `Basic ${Buffer.from(`${brokerUsername}:${brokerPassword}`).toString("base64")}`;
 
   const pactsDir = path.resolve(__dirname, "../../pacts");
   const pactFiles = fs.readdirSync(pactsDir).filter((f) => f.endsWith(".json"));
@@ -30,20 +40,20 @@ module.exports = async function () {
       brokerUrl
     );
 
-    await put(url.toString(), pactContent, brokerToken);
+    await put(url.toString(), pactContent, authHeader);
 
     // Tag the version with the branch name (compatible with all broker versions)
     const branchUrl = new URL(
       `/pacticipants/${encodeURIComponent(consumer)}/versions/${encodeURIComponent(consumerVersion)}/tags/${encodeURIComponent(consumerVersionBranch)}`,
       brokerUrl
     );
-    await put(branchUrl.toString(), "{}", brokerToken);
+    await put(branchUrl.toString(), "{}", authHeader);
 
     console.log(`Published pact: ${consumer} -> ${provider} @ ${consumerVersion} (${consumerVersionBranch})`);
   }
 };
 
-function put(url, body, token) {
+function put(url, body, authHeader) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url);
     const lib = parsed.protocol === "https:" ? https : http;
@@ -58,7 +68,7 @@ function put(url, body, token) {
         headers: {
           "Content-Type": "application/json",
           "Content-Length": data.length,
-          Authorization: `Bearer ${token}`,
+          Authorization: authHeader,
         },
       },
       (res) => {
