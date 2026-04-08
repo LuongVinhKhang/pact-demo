@@ -4,4 +4,5 @@ module.exports = {
   testMatch: ["**/*.pact.spec.ts"],
   silent: true, // suppresses ALL console output
   verbose: false, // hides individual test names
+  globalTeardown: "./jest.pact.publish.js",
 };

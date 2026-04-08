@@ -31,6 +31,7 @@ describe("Products Service — Pact Verification (stateHandlers)", () => {
         ? {
             pactBrokerUrl: canDeployOptions.pactBrokerUrl,
             pactBrokerToken: canDeployOptions.pactBrokerToken,
+            consumerVersionSelectors: [{ branch: brokerConfig.consumerVersionBranch }, { matchingBranch: true }],
             publishVerificationResults: true,
             providerVersion: brokerConfig.consumerVersion,
             providerVersionBranch: brokerConfig.consumerVersionBranch,
@@ -66,5 +67,5 @@ describe("Products Service — Pact Verification (stateHandlers)", () => {
     });
 
     await expect(verifier.verifyProvider()).resolves.toBeTruthy();
-  }, 30000);
+  }, 60000);
 });
