@@ -6,18 +6,20 @@ export const brokerConfig = {
   consumerVersionBranch: process.env.GIT_BRANCH ?? "local",
 };
 
-export const publishOptions = brokerConfig.brokerUrl
-  ? {
-      pactBrokerUrl: brokerConfig.brokerUrl,
-      pactBrokerToken: brokerConfig.brokerToken,
-      consumerVersion: brokerConfig.consumerVersion,
-      consumerVersionBranch: brokerConfig.consumerVersionBranch,
-    }
-  : undefined;
+export const publishOptions =
+  brokerConfig.brokerUrl && brokerConfig.brokerToken
+    ? {
+        pactBrokerUrl: brokerConfig.brokerUrl,
+        pactBrokerToken: brokerConfig.brokerToken,
+        consumerVersion: brokerConfig.consumerVersion,
+        consumerVersionBranch: brokerConfig.consumerVersionBranch,
+      }
+    : undefined;
 
-export const canDeployOptions = brokerConfig.brokerUrl
-  ? {
-      pactBrokerUrl: brokerConfig.brokerUrl,
-      pactBrokerToken: brokerConfig.brokerToken,
-    }
-  : undefined;
+export const canDeployOptions =
+  brokerConfig.brokerUrl && brokerConfig.brokerToken
+    ? {
+        pactBrokerUrl: brokerConfig.brokerUrl,
+        pactBrokerToken: brokerConfig.brokerToken,
+      }
+    : undefined;
