@@ -5,6 +5,7 @@ import { AppModule } from "../../app.module";
 import { INestApplication } from "@nestjs/common";
 import { ProductsService } from "../../products/products.service";
 import { PACT_URLS } from "../pact-paths";
+import { brokerConfig, canDeployOptions } from "../../../../../pact.config";
 
 let app: INestApplication;
 let port: number;
@@ -26,7 +27,15 @@ describe("Products Service — Pact Verification (stateHandlers)", () => {
     const verifier = new Verifier({
       provider: "ProductsService",
       providerBaseUrl: `http://localhost:${port}`,
-      pactUrls: [PACT_URLS.ordersService],
+      ...(canDeployOptions
+        ? {
+            pactBrokerUrl: canDeployOptions.pactBrokerUrl,
+            pactBrokerToken: canDeployOptions.pactBrokerToken,
+            publishVerificationResults: true,
+            providerVersion: brokerConfig.consumerVersion,
+            providerVersionBranch: brokerConfig.consumerVersionBranch,
+          }
+        : { pactUrls: [PACT_URLS.ordersService] }),
       logLevel: "error",
       stateHandlers: {
         "products exist": async () => {
@@ -47,8 +56,10 @@ describe("Products Service — Pact Verification (stateHandlers)", () => {
             { id: "2", name: "Laptop", price: 999.99, inStock: false },
           ];
         },
+        "product with ID 999 is not exist": async () => {
+          (productsService as any)["products"] = [];
+        },
       },
-
       beforeEach: async () => {
         (productsService as any)["products"] = [];
       },
