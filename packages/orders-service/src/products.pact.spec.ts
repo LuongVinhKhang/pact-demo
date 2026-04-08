@@ -1,6 +1,7 @@
 import { PactV3, MatchersV3 } from "@pact-foundation/pact";
 import path from "path";
 import { ProductsClient } from "./products.client";
+import { publishOptions } from "../../../pact.config";
 const { like, eachLike, string, decimal } = MatchersV3;
 
 
@@ -9,6 +10,7 @@ const provider = new PactV3({
   provider: "ProductsService",
   dir: path.resolve(__dirname, "../../../pacts"),
   port: 0,
+  ...(publishOptions ?? {}),
 });
 
 const SERVICE_KEY = "internal-service-key-2024";
