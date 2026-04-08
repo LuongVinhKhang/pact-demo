@@ -5,6 +5,7 @@
  *   - PACT_BROKER_USERNAME + PACT_BROKER_PASSWORD (Basic auth — self-hosted broker)
  * Uses the Pact Broker's REST API directly (no extra dependencies required).
  */
+require("dotenv").config({ path: require("path").resolve(__dirname, "../../.env") });
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
