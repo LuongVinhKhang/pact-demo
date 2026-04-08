@@ -1,0 +1,40 @@
+# .github/workflows/contract-tests.yml
+name: Contract Tests
+
+on: [push, pull_request]
+
+jobs:
+  consumer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run consumer tests (generates + publishes pact)
+        run: pnpm consumer:test
+        env:
+          PACT_BROKER_URL: ${{ secrets.PACT_BROKER_URL }}
+          PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+          GIT_BRANCH: ${{ github.ref_name }}
+          GIT_COMMIT: ${{ github.sha }}
+
+  provider:
+    needs: consumer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run provider verification (reads from broker, runs can-i-deploy)
+        run: pnpm provider:verify
+        env:
+          PACT_BROKER_URL: ${{ secrets.PACT_BROKER_URL }}
+          PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+          GIT_BRANCH: ${{ github.ref_name }}
+          GIT_COMMIT: ${{ github.sha }}
